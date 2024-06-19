@@ -1,0 +1,10 @@
+;;
+
+let
+  f = \Unit ->
+    let
+      x = 1
+    in
+      &x
+in
+  \Unit -> *(,f Unit)

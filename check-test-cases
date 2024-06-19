@@ -1,0 +1,29 @@
+#!/bin/bash
+
+function test {
+  src=$1
+  expected_exit=$2
+
+  cabal run hs -- $src > /dev/null
+  if [[ $? != "$expected_exit" ]]; then
+    printf 'Failed: %s\n' "$src"
+    exit 1
+  fi
+}
+
+cabal build
+
+printf "Running test cases...\n"
+
+cases_dir='code/test-cases'
+accept_dir="$cases_dir/accept"
+reject_dir="$cases_dir/reject"
+
+for f in "$accept_dir"/*; do
+  test "$f" 0
+done
+for f in "$reject_dir"/*; do
+  test "$f" 1
+done
+
+printf "No failing tests\n"

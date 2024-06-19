@@ -1,0 +1,7 @@
+;;
+
+let
+  f : &r a -> &s a
+    = ,castLifetime
+in
+  Unit

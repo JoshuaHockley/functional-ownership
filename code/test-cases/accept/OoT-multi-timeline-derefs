@@ -1,0 +1,12 @@
+;;
+
+let
+  x = 1;
+  f = \Unit ->
+    let
+      y = 2;
+      g = \Unit -> ,add .x .y
+    in
+      g Unit
+in
+  f Unit

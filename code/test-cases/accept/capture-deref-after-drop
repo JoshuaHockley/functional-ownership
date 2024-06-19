@@ -1,0 +1,10 @@
+;;
+
+let
+  f =
+    let
+      x = 1
+    in
+      \[x] Unit -> .x
+in
+  f Unit

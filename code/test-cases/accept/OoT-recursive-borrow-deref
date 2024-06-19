@@ -1,0 +1,11 @@
+;;
+
+let
+  x = 1;
+  rec f = \Unit ->
+    let
+      y = .x
+    in
+      ,f Unit
+in
+  f Unit

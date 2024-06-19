@@ -1,0 +1,7 @@
+;;
+
+let
+  x = 1;
+  f = \Unit -> .x
+in
+  f Unit

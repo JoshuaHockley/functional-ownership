@@ -1,0 +1,12 @@
+data D {
+  D1 : Int -> D
+}
+
+;;
+
+let
+  x = D1 1
+in
+  case &x of {
+    &D1 y -> *y
+  }

@@ -1,0 +1,6 @@
+;;
+
+let
+  x = 1
+in
+  (\Unit -> x) Unit

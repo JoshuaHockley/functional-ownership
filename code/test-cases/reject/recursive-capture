@@ -1,0 +1,8 @@
+;;
+
+let
+  y = 1;
+  rec f
+    = \[y] x -> ,f x
+in
+  f 2

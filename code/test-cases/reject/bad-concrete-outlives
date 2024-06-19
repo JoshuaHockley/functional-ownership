@@ -1,0 +1,10 @@
+;;
+
+let
+  cast : r > s => &r a -> &s b -> &s a
+    = \r s -> ,castLifetime .r;
+  x = 1;
+  y = 2;
+  z = x
+in
+  cast &x &y
