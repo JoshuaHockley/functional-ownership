@@ -4,7 +4,7 @@ function test {
   src=$1
   expected_exit=$2
 
-  cabal run hs -- $src > /dev/null
+  cabal run functional-ownership -- $src > /dev/null
   if [[ $? != "$expected_exit" ]]; then
     printf 'Failed: %s\n' "$src"
     exit 1
