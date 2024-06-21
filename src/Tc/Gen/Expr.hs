@@ -89,11 +89,11 @@ genApp App {f, x} = do
 genLam :: Lam () -> GenM (Typed (Lam Ty))
 genLam Lam {captures, pat, e} = do
   tx <- uvar
-  patCtx <- genPat (pat :- tx)
   captureCtx <- (mconcat <$>) . for captures $
     provideLocalVar . monoTyped <=< genMove
   (((e' :- te, innerTimeline), livenessConstraints), moved) <-
-    listenMoves . listenLivenessConstraints . underTimeline $
+    listenMoves . listenLivenessConstraints . underTimeline $ do
+      patCtx <- genPat (pat :- tx)
       withContext (patCtx <> captureCtx) $ genExpr e
   let lifetime = TRegionCut
         { above = innerTimeline.depth,
