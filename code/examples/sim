@@ -1,0 +1,104 @@
+data SimState {
+  SimState : Int -> Vec Int ->* Map Int Point ->* Map Int Point ->* SimState
+};
+
+data Point {
+  Point : Int -> Int ->* Point
+};
+
+data PositionReport r {
+  PositionReport : Int -> &r Vec Int ->* &r Map Int Point ->* PositionReport r
+};
+
+origin : Unit -> Point = \Unit -> Point 0 0;
+
+addPoints : &r Point ->[r] &s Point ->[r, s] Point
+  = \(&Point x1 y1) (&Point x2 y2) ->
+    Point (,add *.x1 *.x2) (,add *.y1 *.y2);
+
+divPoint : &r Point ->[r] Int ->[r] Point
+  = \(&Point x y) n ->
+    Point (,div *.x .n) (,div *.y .n);
+
+initState : Unit -> SimState
+  = \Unit ->
+    let
+      t = 0;
+      objects = ,push 3 (,push 2 (,push 1 (,newVec Unit)));
+      positions =
+        ,insert 3 (,origin Unit)
+          (,insert 2 (,origin Unit)
+            (,insert 1 (,origin Unit)
+              (,newMap Unit)));
+      velocities =
+        ,insert 3 (Point 0 1)
+          (,insert 2 (Point 1 0)
+            (,insert 1 (Point (,negate 1) (,negate 3))
+              (,newMap Unit)))
+    in
+      SimState t objects positions velocities;
+
+simStep : SimState -> SimState
+  = \(SimState t objects positions velocities) ->
+    let
+      rec moveObjects = \i ps ->
+        if ,gte .i (,len &objects)
+          then
+            ps
+          else
+            let
+              id = ,index .i &objects;
+              v = ,lookup .id &velocities;
+              ps' = ,updateValue (\p -> ,addPoints &p .v) .id ps
+            in
+              ,moveObjects (,add 1 .i) ps';
+      t' = ,add 1 t;
+      positions' = ,moveObjects 0 positions
+    in
+      SimState t' objects positions' velocities;
+
+mkPositionReport : &r SimState ->[r] PositionReport r
+  = \(&SimState t objects positions velocities) ->
+    PositionReport *t objects positions;
+
+meanPosition : &r PositionReport s ->[r, s] Point
+  = \(&PositionReport t objects positions) ->
+    let
+      rec sum = \i total ->
+        if ,gte .i (,len *.objects)
+          then
+            total
+          else
+            let
+              id = ,index .i *.objects;
+              p = ,lookup .id *.positions;
+              total' = ,addPoints .p &total
+            in
+              ,sum (,add 1 .i) total';
+      total = ,sum 0 (,origin Unit)
+    in
+      ,divPoint &total (,len *.objects);
+
+runSim : Int -> Vec Point
+  = \numSteps ->
+    let
+      rec run = \step means state ->
+        let
+          report = ,mkPositionReport &state;
+          mean = ,meanPosition &report;
+          means' = ,push mean means
+        in
+          if ,gte .step .numSteps
+            then
+              means'
+            else
+              let
+                state' = ,simStep state
+              in
+                ,run (,add 1 .step) means' state'
+    in
+      ,run 0 (,newVec Unit) (,initState Unit)
+
+;;
+
+,runSim 100
