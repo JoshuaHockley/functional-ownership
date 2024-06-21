@@ -35,8 +35,14 @@ builtinVars = map (typedValue %~ Var . Ident) . parseTys $
     "len" :- "&r Vec a ->[r] Int",
     "index" :- "Int -> &r Vec a ->[r] &r a",
     "push" :- "a -> Vec a ->* Vec a",
-    "update" :- "Int -> (a ->* a) -> Vec a ->* Vec a ",
+    "updateElem" :- "Int -> (a ->*[r] a) -> Vec a ->*[r] Vec a ",
     "map" :- "(a -> a) -> Vec a -> Vec a",
+
+    "newMap" :- "Unit -> Map k a",
+    "size" :- "&r Map k a ->[r] Int",
+    "lookup" :- "&r k -> &s Map k a ->[r, s] &s a",
+    "insert" :- "k -> a ->* Map k a ->* Map k a",
+    "updateValue" :- "(a ->*[r] a) -> &s k ->* Map k a ->*[r, s] Map k a",
 
     "castLifetime" :- "r > s => &r a -> &s a",
 
@@ -46,7 +52,9 @@ builtinVars = map (typedValue %~ Var . Ident) . parseTys $
 builtinDataCons :: [QTyped DataCon]
 builtinDataCons = map (typedValue %~ DataCon . Ident) . parseTys $
   [ "Unit" :- "Unit",
-    "Pair" :- "a -> b ->* Pair a b"
+    "Pair" :- "a -> b ->* Pair a b",
+    "Nothing" :- "Maybe a",
+    "Just" :- "a -> Maybe a"
   ]
 
 --------------------------------------------------------------------------------
