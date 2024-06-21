@@ -21,7 +21,7 @@ canon = \case
 --------------------------------------------------------------------------------
 
 canonTyEq :: (TyEq Ty Ty) -> SolveM [CanonConstraint]
-canonTyEq = canonTyEq' . orient
+canonTyEq = canonTyEq' . orient . simplifyTyEq
   where
     canonTyEq' = \case
       t1 :~: t2 | t1 == t2 ->
@@ -47,6 +47,10 @@ canonTyEq = canonTyEq' . orient
         | r == s -> pure []
         | otherwise -> pure [CCRegionEq (r :~: s)]
       c -> throwTyError $ EInconsistentTyEq c
+
+    simplifyTyEq (t1 :~: t2) = (simplify t1 :~: simplify t2)
+      where
+        simplify t = maybe t regionFromCanon (canonRegion t)
 
 orient :: TyEq Ty Ty -> TyEq Ty Ty
 orient (t1 :~: t2)
